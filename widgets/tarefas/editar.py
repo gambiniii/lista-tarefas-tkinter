@@ -1,6 +1,7 @@
 import os
 import json
 from tkinter import *
+from enums.status_tarefa import StatusTarefa
 
 
 class EditarTarefa(Frame):
@@ -28,9 +29,10 @@ class EditarTarefa(Frame):
         self.entry_vencimento.pack(fill="x", pady=5)
 
         Label(self, text="Status:", font=self.fonte).pack(anchor="w")
-        self.entry_status = Entry(self, font=self.fonte)
-        self.entry_status.insert(0, self.tarefa.get("status", ""))
-        self.entry_status.pack(fill="x", pady=5)
+        self.status_var = StringVar()
+        self.status_var.set(self.tarefa.get("status", StatusTarefa.PENDENTE.value))
+        options = [status.value for status in StatusTarefa]
+        OptionMenu(self, self.status_var, *options).pack(fill="x", pady=5)
 
         Button(
             self,
@@ -46,7 +48,7 @@ class EditarTarefa(Frame):
             "nome": self.entry_nome.get(),
             "descricao": self.entry_descricao.get(),
             "vencimento": self.entry_vencimento.get(),
-            "status": self.entry_status.get(),
+            "status": self.status_var.get(),
         }
 
         if not os.path.exists("./data"):

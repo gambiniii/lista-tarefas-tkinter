@@ -1,5 +1,4 @@
 import os
-import json
 from tkinter import *
 from tkinter import messagebox
 

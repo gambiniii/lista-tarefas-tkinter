@@ -1,5 +1,4 @@
 from tkinter import Tk
-from widgets.tarefas.cadastrar import Cadastro
 from widgets.tarefas.listar import ListaTarefas
 
 
