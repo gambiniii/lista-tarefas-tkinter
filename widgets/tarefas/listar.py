@@ -1,0 +1,139 @@
+# widgets/tarefas/listar.py
+import os
+import json
+from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
+from widgets.tarefas.cadastrar import Cadastro
+from widgets.tarefas.editar import EditarTarefa
+from widgets.tarefas.deletar import DeletarTarefa
+
+
+class ListaTarefas(Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.pack(padx=20, pady=10)
+
+        self.fonte = ("Arial", 12)
+
+        Label(self, text="Tarefas cadastradas:", font=self.fonte).pack(anchor="w")
+
+        self.tree = ttk.Treeview(
+            self,
+            columns=("nome", "descricao", "vencimento", "status"),
+            show="headings",
+            height=10,
+        )
+        self.tree.pack(fill="both", expand=True, pady=10)
+
+        self.tree.heading("nome", text="Nome")
+        self.tree.heading("descricao", text="Descrição")
+        self.tree.heading("vencimento", text="Vencimento")
+        self.tree.heading("status", text="Status")
+
+        # Botões de editar, deletar e nova tarefa
+        self.btnNova = Button(
+            self,
+            text="Nova Tarefa",
+            font=self.fonte,
+            bg="#4CAF50",
+            fg="white",
+            command=self.abrirCadastro,
+        )
+        self.btnNova.pack(pady=10)
+
+        self.btnEditar = Button(
+            self,
+            text="Editar Tarefa",
+            font=self.fonte,
+            bg="#FF9800",
+            fg="white",
+            command=self.editarTarefa,
+        )
+        self.btnEditar.pack(pady=5)
+
+        self.btnDeletar = Button(
+            self,
+            text="Deletar Tarefa",
+            font=self.fonte,
+            bg="#F44336",
+            fg="white",
+            command=self.deletarTarefa,
+        )
+        self.btnDeletar.pack(pady=5)
+
+        self.carregarTarefas()
+
+    def carregarTarefas(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+
+        if not os.path.exists("./data"):
+            os.makedirs("./data")
+
+        for nome_arquivo in os.listdir("./data"):
+            if nome_arquivo.endswith(".json"):
+                caminho = os.path.join("./data", nome_arquivo)
+                try:
+                    with open(caminho, "r", encoding="utf-8") as file:
+                        tarefa = json.load(file)
+
+                    self.tree.insert(
+                        "",
+                        END,
+                        values=(
+                            tarefa.get("nome", ""),
+                            tarefa.get("descricao", ""),
+                            tarefa.get("vencimento", ""),
+                            tarefa.get("status", ""),
+                        ),
+                    )
+
+                except Exception as e:
+                    print(f"Erro ao carregar {nome_arquivo}: {e}")
+
+    def editarTarefa(self):
+        item_selecionado = self.tree.selection()
+        if not item_selecionado:
+            messagebox.showwarning("Seleção", "Selecione uma tarefa para editar.")
+            return
+
+        nome_tarefa = self.tree.item(item_selecionado)["values"][0]
+        caminho_arquivo = os.path.join("./data", f"{nome_tarefa}.json")
+
+        if os.path.exists(caminho_arquivo):
+            with open(caminho_arquivo, "r", encoding="utf-8") as file:
+                tarefa = json.load(file)
+
+            nova_janela = Toplevel(self.master)
+            nova_janela.title(f"Editar Tarefa - {nome_tarefa}")
+            nova_janela.geometry("450x300")
+            EditarTarefa(
+                master=nova_janela, tarefa=tarefa, ao_salvar=self.carregarTarefas
+            ).pack()
+        else:
+            messagebox.showerror("Erro", "Tarefa não encontrada.")
+
+    def deletarTarefa(self):
+        item_selecionado = self.tree.selection()
+        if not item_selecionado:
+            messagebox.showwarning("Seleção", "Selecione uma tarefa para deletar.")
+            return
+
+        nome_tarefa = self.tree.item(item_selecionado)["values"][0]
+
+        nova_janela = Toplevel(self.master)
+        nova_janela.title(f"Deletar Tarefa - {nome_tarefa}")
+        nova_janela.geometry("400x200")
+        DeletarTarefa(
+            master=nova_janela, nome_tarefa=nome_tarefa, ao_deletar=self.carregarTarefas
+        ).pack()
+
+    def abrirCadastro(self):
+        nova_janela = Toplevel(self.master)
+        nova_janela.title("Nova Tarefa")
+        nova_janela.geometry("450x300")
+        Cadastro(master=nova_janela, ao_salvar=self.carregarTarefas).pack()
+
+
