@@ -27,7 +27,7 @@ class Cadastro(Frame):
         self.botaoSalvar = Button(
             self,
             text="Salvar",
-            command=self.cadastro,
+            command=self.cadastrar,
             font=self.fonte,
             bg="#2196F3",
             fg="white",
@@ -56,7 +56,7 @@ class Cadastro(Frame):
             entry.pack(side=LEFT, padx=5)
             setattr(self, attr_name, entry)
 
-    def cadastro(self):
+    def cadastrar(self):
         nome = self.entry_nome.get()
         descricao = self.entry_descricao.get()
         vencimento = self.entry_vencimento.get()

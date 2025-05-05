@@ -23,19 +23,28 @@ class ListaTarefas(Frame):
         filtros_frame = Frame(self)
         filtros_frame.pack(fill="x", pady=5)
 
-        Label(filtros_frame, text="Filtrar por vencimento:", font=self.fonte).pack(side=LEFT)
+        Label(filtros_frame, text="Filtrar por vencimento:", font=self.fonte).pack(
+            side=LEFT
+        )
         self.filtro_vencimento = Entry(filtros_frame, font=self.fonte, width=12)
         self.filtro_vencimento.pack(side=LEFT, padx=5)
 
         Label(filtros_frame, text="Status:", font=self.fonte).pack(side=LEFT)
         self.filtro_status = StringVar()
-        self.filtro_status.set("")  # vazio significa "sem filtro"
+        self.filtro_status.set("")
         status_options = [""] + [status.value for status in StatusTarefa]
-        self.status_dropdown = OptionMenu(filtros_frame, self.filtro_status, *status_options)
+        self.status_dropdown = OptionMenu(
+            filtros_frame, self.filtro_status, *status_options
+        )
         self.status_dropdown.config(font=self.fonte)
         self.status_dropdown.pack(side=LEFT, padx=5)
 
-        Button(filtros_frame, text="Aplicar Filtros", font=self.fonte, command=self.carregarTarefas).pack(side=LEFT, padx=10)
+        Button(
+            filtros_frame,
+            text="Aplicar Filtros",
+            font=self.fonte,
+            command=self.carregarTarefas,
+        ).pack(side=LEFT, padx=10)
 
         self.tree = ttk.Treeview(
             self,
@@ -50,7 +59,6 @@ class ListaTarefas(Frame):
         self.tree.heading("vencimento", text="Vencimento")
         self.tree.heading("status", text="Status")
 
-        # Botões de editar, deletar e nova tarefa
         self.btnNova = Button(
             self,
             text="Nova Tarefa",
@@ -164,5 +172,3 @@ class ListaTarefas(Frame):
         nova_janela.title("Nova Tarefa")
         nova_janela.geometry("450x300")
         Cadastro(master=nova_janela, ao_salvar=self.carregarTarefas).pack()
-
-

@@ -39,13 +39,13 @@ class EditarTarefa(Frame):
         Button(
             self,
             text="Salvar",
-            command=self.salvar,
+            command=self.editar,
             font=self.fonte,
             bg="#2196F3",
             fg="white",
         ).pack(pady=10)
 
-    def salvar(self):
+    def editar(self):
         nome = self.entry_nome.get()
         descricao = self.entry_descricao.get()
         vencimento = self.entry_vencimento.get()
