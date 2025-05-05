@@ -1,7 +1,9 @@
 import os
 import json
 from tkinter import *
+from tkinter import messagebox
 from enums.status_tarefa import StatusTarefa
+from helpers.data_valida import data_valida
 
 
 class EditarTarefa(Frame):
@@ -44,11 +46,26 @@ class EditarTarefa(Frame):
         ).pack(pady=10)
 
     def salvar(self):
+        nome = self.entry_nome.get()
+        descricao = self.entry_descricao.get()
+        vencimento = self.entry_vencimento.get()
+        status = self.status_var.get()
+
+        if not (nome and descricao and vencimento and status):
+            messagebox.showerror("Tarefa inválida!", "Preencha todos os campos.")
+            return
+
+        if not data_valida(vencimento):
+            messagebox.showerror(
+                "Data inválida", "A data deve estar no formato dd/mm/aaaa e ser válida."
+            )
+            return
+
         tarefa = {
-            "nome": self.entry_nome.get(),
-            "descricao": self.entry_descricao.get(),
-            "vencimento": self.entry_vencimento.get(),
-            "status": self.status_var.get(),
+            "nome": nome,
+            "descricao": descricao,
+            "vencimento": vencimento,
+            "status": status,
         }
 
         if not os.path.exists("./data"):

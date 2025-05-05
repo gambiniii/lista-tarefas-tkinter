@@ -4,6 +4,7 @@ import json
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from enums.status_tarefa import StatusTarefa
 from widgets.tarefas.cadastrar import Cadastro
 from widgets.tarefas.editar import EditarTarefa
 from widgets.tarefas.deletar import DeletarTarefa
@@ -18,6 +19,23 @@ class ListaTarefas(Frame):
         self.fonte = ("Arial", 12)
 
         Label(self, text="Tarefas cadastradas:", font=self.fonte).pack(anchor="w")
+
+        filtros_frame = Frame(self)
+        filtros_frame.pack(fill="x", pady=5)
+
+        Label(filtros_frame, text="Filtrar por vencimento:", font=self.fonte).pack(side=LEFT)
+        self.filtro_vencimento = Entry(filtros_frame, font=self.fonte, width=12)
+        self.filtro_vencimento.pack(side=LEFT, padx=5)
+
+        Label(filtros_frame, text="Status:", font=self.fonte).pack(side=LEFT)
+        self.filtro_status = StringVar()
+        self.filtro_status.set("")  # vazio significa "sem filtro"
+        status_options = [""] + [status.value for status in StatusTarefa]
+        self.status_dropdown = OptionMenu(filtros_frame, self.filtro_status, *status_options)
+        self.status_dropdown.config(font=self.fonte)
+        self.status_dropdown.pack(side=LEFT, padx=5)
+
+        Button(filtros_frame, text="Aplicar Filtros", font=self.fonte, command=self.carregarTarefas).pack(side=LEFT, padx=10)
 
         self.tree = ttk.Treeview(
             self,
@@ -66,6 +84,9 @@ class ListaTarefas(Frame):
         self.carregarTarefas()
 
     def carregarTarefas(self):
+        vencimento_filtro = self.filtro_vencimento.get().strip()
+        status_filtro = self.filtro_status.get().strip()
+
         for row in self.tree.get_children():
             self.tree.delete(row)
 
@@ -79,14 +100,22 @@ class ListaTarefas(Frame):
                     with open(caminho, "r", encoding="utf-8") as file:
                         tarefa = json.load(file)
 
+                    vencimento = tarefa.get("vencimento", "")
+                    status = tarefa.get("status", "")
+
+                    if vencimento_filtro and vencimento_filtro not in vencimento:
+                        continue
+                    if status_filtro and status != status_filtro:
+                        continue
+
                     self.tree.insert(
                         "",
                         END,
                         values=(
                             tarefa.get("nome", ""),
                             tarefa.get("descricao", ""),
-                            tarefa.get("vencimento", ""),
-                            tarefa.get("status", ""),
+                            vencimento,
+                            status,
                         ),
                     )
 

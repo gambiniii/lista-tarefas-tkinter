@@ -1,7 +1,9 @@
 from tkinter import *
 import json
 import os
+from tkinter import messagebox
 from enums.status_tarefa import StatusTarefa
+from helpers.data_valida import data_valida
 
 
 class Cadastro(Frame):
@@ -55,11 +57,26 @@ class Cadastro(Frame):
             setattr(self, attr_name, entry)
 
     def cadastro(self):
+        nome = self.entry_nome.get()
+        descricao = self.entry_descricao.get()
+        vencimento = self.entry_vencimento.get()
+        status = self.entry_status.get()
+
+        if not (nome or descricao or vencimento or status):
+            messagebox.showerror("Tarefa inválida!", "Preencha todos os campos.")
+            return
+
+        if not data_valida(vencimento):
+            messagebox.showerror(
+                "Data inválida", "A data deve estar no formato dd/mm/aaaa e ser válida."
+            )
+            return
+
         tarefa = {
-            "nome": self.entry_nome.get(),
-            "descricao": self.entry_descricao.get(),
-            "vencimento": self.entry_vencimento.get(),
-            "status": self.entry_status.get(),
+            "nome": nome,
+            "descricao": descricao,
+            "vencimento": vencimento,
+            "status": status,
         }
 
         if not os.path.exists("./data"):
