@@ -33,8 +33,11 @@ class DeletarTarefa(Frame):
         ).pack(pady=5)
 
     def deletar(self):
+        # Gera o caminho do arquivo
+        # No formato: "../data/nome_arquivo.json"
         caminho_arquivo = os.path.join("./data", f"{self.nome_tarefa}.json")
 
+        # Com o caminho_arquivo, procura o arquivo desejado
         if os.path.exists(caminho_arquivo):
             os.remove(caminho_arquivo)
             messagebox.showinfo("Sucesso", "Tarefa deletada com sucesso.")
